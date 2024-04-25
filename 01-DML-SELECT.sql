@@ -272,13 +272,14 @@ SELECT first_name, last_name,
     RPAD(first_name, 20, '*')   -- 오른쪽 빈 자리 채움
 FROM employees;
 
+--SQL인덱스는 1부터 시작
 SELECT '    Oracle      ',
     '*****Database*****',
     LTRIM('    Oracle      '),      -- 왼쪽의 빈 공간 삭제
     RTRIM('    Oracle      '),       -- 오른쪽의 빈 공간 삭제
     TRIM('*' FROM '*****Database*****'), -- 앞뒤의 잡음 문자 제거
     SUBSTR('Oracle Database', 8, 4),     -- 부분 문자열 (8번인덱스부터 4글자 추출)
-    SUBSTR('Oracle Database', -8, 4),    -- 역인덱스 이용 부분 문자열 (인덱스 1부터 시작)
+    SUBSTR('Oracle Database', -8, 4),    -- 역인덱스 이용 부분 문자열 
     LENGTH('Oracle Database')            -- 문자열 길이
 FROM dual; --가상테이블 dual
 
