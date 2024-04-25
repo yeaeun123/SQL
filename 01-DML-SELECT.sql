@@ -253,9 +253,164 @@ ORDER BY department_id ASC,
         
 -- 정렬 기준을 어떻게 세우느냐에 따라서 성능, 출력 결과에 영향을 미칠 수 있다! 
 
+---------------------------
+-- 단일행 함수
+---------------------------
+-- 단일 레코드를 기준으로 특정 컬럼의 값에 적용되는 함수
+
+-- 문자열 단일행 함수
+SELECT first_name, last_name,
+    CONCAT(first_name, CONCAT(' ', last_name)),  -- 문자열 연결 함수
+    first_name || ' ' || last_name,      -- 문자열 연결연산 쓰는게 더 편함!
+    INITCAP(first_name || ' ' || last_name) -- 각 단어의 첫 글자를 대문자로
+FROM employees;
+
+SELECT first_name, last_name,
+    LOWER(first_name),      -- 모두 소문자로
+    UPPER(first_name),      -- 모두 대문자로
+    LPAD(first_name, 20, '*'),  -- 왼쪽 빈 자리 채움 (20글자를 만들고 나머지공간에 *채움)
+    RPAD(first_name, 20, '*')   -- 오른쪽 빈 자리 채움
+FROM employees;
+
+SELECT '    Oracle      ',
+    '*****Database*****',
+    LTRIM('    Oracle      '),      -- 왼쪽의 빈 공간 삭제
+    RTRIM('    Oracle      '),       -- 오른쪽의 빈 공간 삭제
+    TRIM('*' FROM '*****Database*****'), -- 앞뒤의 잡음 문자 제거
+    SUBSTR('Oracle Database', 8, 4),     -- 부분 문자열 (8번인덱스부터 4글자 추출)
+    SUBSTR('Oracle Database', -8, 4),    -- 역인덱스 이용 부분 문자열 (인덱스 1부터 시작)
+    LENGTH('Oracle Database')            -- 문자열 길이
+FROM dual; --가상테이블 dual
+
+
+-- 수치형 단일행 함수
+
+SELECT 3.14159,
+    ABS(-3.14),  -- 절대값 
+    CEIL(3.14),  -- 올림
+    FLOOR(3.14),  -- 버림
+    ROUND(3.5),   -- 반올림
+    ROUND(3.14159, 3),   --소수점 셋째 자리까지 반올림 (실제 반올림=넷째 자리)
+    TRUNC(3.5),    -- 버림
+    TRUNC(3.14159, 3), -- 소수점 넷째 자리에서 버림
+    SIGN(-3.14159),     -- 부호 (-1 : 음수, 0:0, 1:양수)
+    MOD(7, 3),       -- 나머지
+    POWER(2, 4)      -- 2의 4제곱
+FROM dual; --가상테이블 dual
+
+---------------------------
+-- DATE FORMAT
+---------------------------
+
+-- 현재 세션 정보 확인
+SELECT * 
+FROM nls_session_parameters;
+
+-- 현재 날짜 포맷이 어떻게 되는가 
+-- 딕셔너리를 확인 (SYSTEM 저장소 접속)
+SELECT value FROM nls_session_parameters
+WHERE parameter = 'NLS_DATE_FORMAT';
+
+-- 현재 날짜 : SYSDATE
+SELECT sysdate FROM dual;   -- 가상 테이블 dual로부터 받아오므로 1개의 레코드
+
+SELECT sysdate FROM employees; 
+--employees 테이블로부터 받아와서 employees테이블의 레코드 갯수만큼 데이터 출력
+
+-- 날짜 관련 단일행 함수
+SELECT 
+    sysdate,
+    ADD_MONTHS(sysdate, 2),  -- 2개월이 지난 후의 날짜
+    LAST_DAY(sysdate),       -- 현재 달의 마지막 날
+    MONTHS_BETWEEN('12/09/24', sysdate), --12년9월24일부터 오늘까지 몇 개월 차이나는지
+    NEXT_DAY(sysdate,2),    --1:일요일~ 7:토요일/ 오늘날짜 기준 다음 월요일 찾기
+    NEXT_DAY(sysdate,'월' ),    
+    --NLS_DATE_LANGUAGE의 설정에 따름 / 오늘날짜 기준 다음 월요일 찾기
+    ROUND(sysdate,'MONTH'),      --MONTH를 기준으로 반올림
+    TRUNC(sysdate,'MONTH')   --MONTH를 기준으로 버림
+FROM dual;
+
+SELECT first_name, hire_date,
+    ROUND(MONTHS_BETWEEN(sysdate, hire_date)) as 근속월수
+FROM employees;
+
+-----------------
+-- 변환 함수
+-----------------
+
+-- TO_NUMBER(s, fmt) : 문자열 -> 숫자
+-- TO_DATE(s, fmt) : 문자열 -> 날짜
+-- TO_CHAR(o, fmt) : 숫자, 날짜-> 문자열
+
+-- TO_CHAR 숫자, 날짜-> 문자
+SELECT first_name,
+   TO_CHAR(hire_date,'YYYY-MM-DD')  -- 년-월-일
+FROM employees;
+
+-- 현재 시간을 년-월-일 시:분:초로 표기
+SELECT sysdate,
+    TO_CHAR(sysdate,'YYYY-MM-DD HH24:MI:SS')
+FROM dual;
+
+SELECT 
+    TO_CHAR(3000000, 'L999,999,999.99') --L표시:로컬 화폐 단위
+FROM dual;
+
+-- 모든 직원의 이름과 연봉 정보를 표시
+SELECT first_name, salary, commission_pct,
+    TO_CHAR(salary + salary * nvl(commission_pct, 0)*12, '$999,999.00') 연봉
+FROM employees;
+
+-- TO_NUMBER 문자->숫자
+SELECT '$57,600',
+    TO_NUMBER('$57,600', '$999,999') / 12 월급
+FROM dual;
+
+-- TO_DATE 문자->날짜
+SELECT '2012-09-24 13:48:00',
+    TO_DATE('2012-09-24 13:48:00', 'YYYY-MM-DD HH24:MI:SS') 
+    --날짜형식이 RR/MM/DD 로 되어 있으므로 TO_DATE 정보가 12/09/24로 표시
+FROM dual;
 
 
 
+--문제 1.
+--전체직원의 다음 정보를 조회하세요. 정렬은 입사일(hire_date)의 올림차순(ASC)으로 가장 선
+--임부터 출력이 되도록 하세요. 이름(first_name last_name), 월급(salary), 전화번호
+--(phone_number), 입사일(hire_date) 순서이고 “이름”, “월급”, “전화번호”, “입사일” 로 컬럼이
+--름을 대체해 보세요.
+SELECT first_name 이름, salary 월급, phone_number 전화번호,hire_date 입사일
+FROM employees 
+ORDER BY hire_date ASC;
+
+--문제2.
+--업무(jobs)별로 업무이름(job_title)과 최고월급(max_salary)을 월급의 내림차순(DESC)로 정렬
+SELECT job_title, max_salary
+FROM jobs
+ORDER BY max_salary DESC;
+
+--문제3.
+--담당 매니저가 배정되어있으나 커미션비율이 없고, 월급이 3000초과인 직원의 이름, 매니저
+--아이디, 커미션 비율, 월급 을 출력하세요.
+SELECT first_name, manager_id, commission_pct, salary
+FROM employees 
+WHERE commission_pct IS NULL;
+
+--문제4.
+--최고월급(max_salary)이 10000 이상인 업무의 이름(job_title)과 최고월급(max_salary)을 최
+--고월급의(max_salary) 내림차순(DESC)로 정렬하여 출력하세요.
+SELECT job_title, max_salary
+FROM jobs
+WHERE max_salary >= 10000
+ORDER BY max_salary DESC;
+
+--문제5.
+--월급이 14000 미만 10000 이상인 직원의 이름(first_name), 월급, 커미션퍼센트 를 월급순
+--(내림차순) 출력하세오. 단 커미션퍼센트 가 null 이면 0 으로 나타내시오
+SELECT first_name, salary, NVL(commission_pct,0)
+FROM employees
+WHERE salary < 14000 AND salary >= 10000
+ORDER BY salary DESC;
 
 
 
