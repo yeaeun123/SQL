@@ -65,12 +65,12 @@ FROM countries
 ORDER BY country_name ASC;
 
 --문제10.
---입사일이 03/12/31 일 이전 입사한 직원의 이름, 월급, 전화 번호, 입사일을 출력하세요
+--입사일이 13/12/31 일 이전 입사한 직원의 이름, 월급, 전화 번호, 입사일을 출력하세요
 --전화번호는 545-343-3433 과 같은 형태로 출력하시오.
 SELECT first_name, salary, 
     SUBSTR(REPLACE(phone_number,'.','-'),3), hire_date
 FROM employees
-WHERE hire_date <= '17/12/31';
+WHERE hire_date <= '13/12/31';
 
 
 
