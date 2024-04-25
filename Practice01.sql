@@ -53,9 +53,9 @@ WHERE LOWER(first_name) LIKE '%s%';
 
 --문제8.
 --전체 부서를 출력하려고 합니다. 순서는 부서이름이 긴 순서대로 출력해 보세오.
-SELECT first_name, job_id
-FROM employees
-ORDER BY LENGTH(job_id) DESC;
+SELECT department_name
+FROM departments
+ORDER BY LENGTH(department_name) DESC;
 
 --문제9.
 --정확하지 않지만, 지사가 있을 것으로 예상되는 나라들을 나라이름을 대문자로 출력하고
