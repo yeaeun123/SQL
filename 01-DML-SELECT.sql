@@ -372,51 +372,68 @@ SELECT '2012-09-24 13:48:00',
     --날짜형식이 RR/MM/DD 로 되어 있으므로 TO_DATE 정보가 12/09/24로 표시
 FROM dual;
 
+-- 날짜 연산
+-- Date +/- Number : 특정 날 수를 더하거나 뺄 수 있다.
+-- Date - Date : 두 날짜의 경과 일수 
+-- Date + Number / 24 : 특정 시간이 지난 후의 날짜 
+SELECT
+    sysdate,
+    sysdate + 1, sysdate - 1,
+    sysdate - TO_DATE('20120924'),   -- 날짜 사이의 경과일수
+    sysdate + 48 / 24   --48시간이 지난 후의 날짜 
+FROM dual;
 
+-- nvl function
+SELECT first_name, 
+    salary, 
+    nvl(salary * commission_pct,0) commission   -- nvl(표현식, 대체값)
+FROM employees;
 
---문제 1.
---전체직원의 다음 정보를 조회하세요. 정렬은 입사일(hire_date)의 올림차순(ASC)으로 가장 선
---임부터 출력이 되도록 하세요. 이름(first_name last_name), 월급(salary), 전화번호
---(phone_number), 입사일(hire_date) 순서이고 “이름”, “월급”, “전화번호”, “입사일” 로 컬럼이
---름을 대체해 보세요.
-SELECT first_name 이름, salary 월급, phone_number 전화번호,hire_date 입사일
-FROM employees 
-ORDER BY hire_date ASC;
+-- nvl2 function
+SELECT first_name,
+    salary,
+    nvl2(commission_pct, salary * commission_pct, 0) commission 
+    --nvl2(조건문, null이 아닐 때의 값, null일 때의 값)
+FROM employees;
 
---문제2.
---업무(jobs)별로 업무이름(job_title)과 최고월급(max_salary)을 월급의 내림차순(DESC)로 정렬
-SELECT job_title, max_salary
-FROM jobs
-ORDER BY max_salary DESC;
+-- CASE function
+-- 보너스를 지급하기로 했다.
+-- AD관련 직원에게는 20%, SA관련 직원에게는 10%, IT관련 직원들에게는 8%, 나머지에게는 5%
+SELECT first_name, job_id, salary,
+    SUBSTR(job_id, 1, 2),
+    CASE SUBSTR(job_id, 1, 2) WHEN 'AD' THEN salary * 0.2
+                            WHEN 'SA' THEN salary * 0.1
+                             WHEN 'IT' THEN salary * 0.08
+                             ELSE salary * 0.05
+    END bonus
+FROM employees;
 
---문제3.
---담당 매니저가 배정되어있으나 커미션비율이 없고, 월급이 3000초과인 직원의 이름, 매니저
---아이디, 커미션 비율, 월급 을 출력하세요.
-SELECT first_name, manager_id, commission_pct, salary
-FROM employees 
-WHERE commission_pct IS NULL;
+-- DECODE function
+SELECT first_name, job_id, salary,
+    SUBSTR(job_id, 1,2),
+    DECODE(SUBSTR(job_id, 1, 2),     --비교할 값
+            'AD', salary * 0.2,
+            'SA', salary * 0.1,
+            'IT', salary * 0.08,
+            salary * 0.05) bonus
+FROM employees;
 
---문제4.
---최고월급(max_salary)이 10000 이상인 업무의 이름(job_title)과 최고월급(max_salary)을 최
---고월급의(max_salary) 내림차순(DESC)로 정렬하여 출력하세요.
-SELECT job_title, max_salary
-FROM jobs
-WHERE max_salary >= 10000
-ORDER BY max_salary DESC;
-
---문제5.
---월급이 14000 미만 10000 이상인 직원의 이름(first_name), 월급, 커미션퍼센트 를 월급순
---(내림차순) 출력하세오. 단 커미션퍼센트 가 null 이면 0 으로 나타내시오
-SELECT first_name, salary, NVL(commission_pct,0)
+--연습문제A
+--직원의 이름, 부서, 팀을 출력
+-- 팀은 부서id로 결정
+-- 부서id가 10~30: A-GROUP
+-- 40~50 : B-GROUP
+-- 60~100: C-GROUP
+--나머지부서: REMAINDER
+SELECT first_name, department_id, 
+    CASE
+        WHEN department_id <= 30 THEN 'A-GROUP'
+        WHEN department_id <= 50 THEN 'B-GROUP'
+        WHEN department_id <= 100 THEN 'C-GROUP'
+        ELSE 'REMAINDER'
+    END team
 FROM employees
-WHERE salary < 14000 AND salary >= 10000
-ORDER BY salary DESC;
-
-
-
-
-
-
+ORDER BY team ASC, department_id ASC;
 
 
 
