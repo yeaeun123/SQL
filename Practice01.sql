@@ -87,6 +87,7 @@ ORDER BY UPPER(country_name) ASC;
 전화번호는 545-343-3433 과 같은 형태로 출력하시오.*/
 SELECT first_name, salary, 
     SUBSTR(REPLACE(phone_number, '.', '-'),3) phone_number, hire_date
+    -- REPLACE(SUBSTR(phone_number, 3), '.', '-') <-이것도 가능
 FROM employees
 WHERE hire_date <= '13/12/31';
 
