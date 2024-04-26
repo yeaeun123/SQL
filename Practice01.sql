@@ -37,46 +37,56 @@ FROM jobs
 WHERE max_salary >= 10000
 ORDER BY max_salary DESC;
 
---문제5.
---월급이 14000 미만 10000 이상인 직원의 이름(first_name), 월급, 커미션퍼센트 를 월급순
---(내림차순) 출력하세오. 단 커미션퍼센트 가 null 이면 0 으로 나타내시오
-SELECT first_name, salary, NVL(commission_pct,0)
+/*문제5.
+월급이 14000 미만 10000 이상인 직원의 이름(first_name), 월급, 커미션퍼센트 를 월급순
+(내림차순) 출력하세오. 단 커미션퍼센트 가 null 이면 0 으로 나타내시오*/
+SELECT first_name, salary, nvl(commission_pct, 0)
 FROM employees
-WHERE salary < 14000 AND salary >= 10000
+WHERE salary < 14000 
+    AND salary >= 10000
 ORDER BY salary DESC;
 
---문제6.
---부서번호가 10, 90, 100 인 직원의 이름, 월급, 입사일, 부서번호를 나타내시오
---입사일은 1977-12 와 같이 표시하시오
+/*문제6.
+부서번호가 10, 90, 100 인 직원의 이름, 월급, 입사일, 부서번호를 나타내시오
+입사일은 1977-12 와 같이 표시하시오*/
+DESC employees;
 SELECT first_name, salary, 
-    TO_CHAR(hire_date, 'YYYY-MM'), department_id
+    TO_CHAR(hire_date, 'YYYY-MM') hire_date, department_id
 FROM employees
 WHERE department_id IN(10, 90, 100);
 
---문제7.
---이름(first_name)에 S 또는 s 가 들어가는 직원의 이름, 월급을 나타내시오
+-- IN 또는 OR 로 사용가능
+SELECT first_name, salary, 
+    TO_CHAR(hire_date, 'YYYY-MM') hire_date, department_id
+FROM employees
+WHERE department_id = 10 OR
+    department_id = 90 OR
+    department_id = 100;
+
+/*문제7.
+이름(first_name)에 S 또는 s 가 들어가는 직원의 이름, 월급을 나타내시오*/
 SELECT first_name, salary
 FROM employees
 WHERE LOWER(first_name) LIKE '%s%';
 
---문제8.
---전체 부서를 출력하려고 합니다. 순서는 부서이름이 긴 순서대로 출력해 보세오.
+/*문제8.
+전체 부서를 출력하려고 합니다. 순서는 부서이름이 긴 순서대로 출력해 보세오.*/
 SELECT department_name
 FROM departments
 ORDER BY LENGTH(department_name) DESC;
 
---문제9.
---정확하지 않지만, 지사가 있을 것으로 예상되는 나라들을 나라이름을 대문자로 출력하고
---올림차순(ASC)으로 정렬해 보세오.
-SELECT UPPER(country_name)
+/*문제9.
+정확하지 않지만, 지사가 있을 것으로 예상되는 나라들을 나라이름을 대문자로 출력하고
+올림차순(ASC)으로 정렬해 보세오.*/
+SELECT UPPER(country_name) country_name
 FROM countries
-ORDER BY country_name ASC;
+ORDER BY UPPER(country_name) ASC;
 
---문제10.
---입사일이 13/12/31 일 이전 입사한 직원의 이름, 월급, 전화 번호, 입사일을 출력하세요
---전화번호는 545-343-3433 과 같은 형태로 출력하시오.
+/*문제10.
+입사일이 13/12/31 일 이전 입사한 직원의 이름, 월급, 전화 번호, 입사일을 출력하세요
+전화번호는 545-343-3433 과 같은 형태로 출력하시오.*/
 SELECT first_name, salary, 
-    SUBSTR(REPLACE(phone_number,'.','-'),3), hire_date
+    SUBSTR(REPLACE(phone_number, '.', '-'),3) phone_number, hire_date
 FROM employees
 WHERE hire_date <= '13/12/31';
 
