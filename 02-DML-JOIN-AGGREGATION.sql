@@ -151,8 +151,39 @@ SELECT * FROM employees emp NATURAL JOIN departments dept;
 --SELECT *  FROM employees emp JOIN departments dept ON emp.department_id = dept.department_id;
 --SELECT *  FROM employees emp JOIN departments dept ON emp.manager_id = dept.manager_id;
 
-SELECT *  FROM employees emp JOIN departments dept ON emp.manager_id = dept.manager_id AND emp.department_id = dept.department_id;
+SELECT *  FROM employees emp 
+    JOIN departments dept ON emp.manager_id = dept.manager_id 
+    AND emp.department_id = dept.department_id;
 
 -------------------
 -- SELF JOIN
 -------------------
+-- 자기 자신과 JOIN
+-- 자신을 두번 호출-> 별칭을 반드시 부여해야함!
+
+SELECT * FROM employees; --107명
+
+SELECT 
+    emp.employee_id,
+    emp.first_name,
+    emp.manager_id,
+    man.first_name
+FROM employees emp JOIN employees man 
+    ON emp.manager_id = man.employee_id; --106
+    
+SELECT 
+    emp.employee_id,
+    emp.first_name,
+    emp.manager_id,
+    man.first_name
+FROM employees emp, employees man
+WHERE emp.manager_id = man.employee_id; --106
+
+-- Steven(매니저 없는 사람) 까지 포함해서 출력
+SELECT 
+    emp.employee_id,
+    emp.first_name,
+    emp.manager_id,
+    man.first_name
+FROM employees emp RIGHT OUTER JOIN employees man 
+    ON emp.manager_id = man.employee_id;
