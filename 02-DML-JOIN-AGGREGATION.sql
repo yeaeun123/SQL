@@ -314,6 +314,8 @@ ORDER BY department_id;
 -------------------------
 -- SUBQUERY 
 -------------------------
+-- 하나의 SQL 질의문 속에 다른 SQL 질의문이 포함되어 있는 형태
+
 -- Single-Row Subquery
 -- Subquery의 결과가 한 ROW인 경우
 -- Single-Row Operator를 사용해야 함: =, >, >=, <, <=, <>
@@ -365,8 +367,191 @@ WHERE salary >= (SELECT MEDIAN(salary) FROM employees) AND  -- 조건1
     hire_date > (SELECT hire_date FROM employees WHERE first_name = 'Susan') --조건2
 ORDER BY hire_date ASC, salary DESC;
 
+--------------------------------------
+SELECT {Projection_list}
+FROM {talbe_list}
+	[JOIN join_table ON join_condition]
+WHERE {selection_condition}
+GROUP BY {grouping_field}
+	HAVING {AGGREgation_condition}
+ORDER BY {order_condition};
+
+--------------------------------------
+-- 다중행 서브쿼리 Multi Subquery
+-- 서브쿼리 결과가 둘 이상의 레코드일때 단일행 비교연산자는 사용할 수 없다.
+-- 집합 연산에 관련된 IN, ANY, ALL, EXISTS 등을 사용해야 한다.
+
+--IN 리턴되는 값 중에서 조건에 해당하는 값이 있으면 참
+--ANY, SOME 서브쿼리에 의해 리턴되는 각각의 값과 조건을 비교하여 하나 이상을 만족하면 참
+--ALL 값을 서브쿼리에 의해 리톤되는 모든 값을 비교하여 모두 만족해야 참
+--EXISTS 메인 쿼리의 비교 조건이 서브쿼리의 결과 중에서 만족하는 값이 하나라도 존재하면 참
+
+--IN 연산자 = OR
+-- 직원들 중, 110번 부서 사람들이 받는 급여와 같은 급여를 받는 직원들의 목록?
+--1. 110번 부서 사람들의 급여는?
+SELECT salary FROM employees
+WHERE department_id = 110;      --12008, 8300
+
+-- 2. 직원 중에서 급여가 12008, 8300인 직원의 목록?
+SELECT first_name, salary 
+FROM employees 
+WHERE salary IN(12008, 8300);
+
+-- 1.번 2.번 두 쿼리를 하나로 합쳐보기
+SELECT first_name, salary
+FROM employees
+WHERE salary IN (SELECT salary 
+                FROM employees 
+                WHERE department_id = 110);
+
+--ALL연산자 = AND
+-- 110번 부서 사람들이 받는 급여보다 많은 급여를 받는 직원 목록?
+-- 1. 110번 부서 사람들이 받는 급여?
+SELECT salary FROM employees 
+WHERE department_id = 110;
+
+-- 2. 1번 쿼리보다 많은 급여를 받는 직원들의 목록
+SELECT first_name, salary
+FROM employees
+WHERE salary > ALL(12008, 8300);
+
+-- 1번, 2번의 쿼리 하나로 합치기
+SELECT first_name, salary
+FROM employees
+WHERE salary > ALL(SELECT salary 
+                    FROM employees
+                    WHERE department_id = 110);
+
+--ANY연산자 = OR
+-- 110번 부서 사람들이 받는 급여 중 하나보다 많은 급여를 받는 직원 목록?
+-- 1. 110번 부서 사람들이 받는 급여?
+SELECT salary FROM employees 
+WHERE department_id = 110;
+
+-- 2. 1번 쿼리 중 하나보다 많은 급여를 받는 직원 목록?
+SELECT first_name, salary
+FROM employees
+WHERE salary > ANY (12008, 8300)
+ORDER BY salary DESC;
+
+-- 1번, 2번의 쿼리 하나로 합치기
+SELECT first_name, salary
+FROM employees 
+WHERE salary > ANY(SELECT salary FROM employees WHERE department_id = 110)
+ORDER BY salary DESC;
 
 
+-- Correlated Query :연관 쿼리
+-- 바깥 쪽 쿼리(Outer Query)와 안쪽 쿼리(Inner Query)가 서로 연관된 쿼리
+SELECT first_name, salary, department_id
+FROM employees outer
+WHERE salary > (SELECT AVG(salary)
+                FROM employees
+                WHERE department_id = outer.department_id);
+-- 외부 쿼리 : 급여를 특정 값보다 많이 받는 직원의 이름, 급여, 부서id
+-- 내부 쿼리 : 특정 부서에 소속된 직원의 평균 급여
+-- 자신이 속한 부서의 평균 급여보다 많이 받는 직원의 목록을 구하라는 의미
+-- 외부 쿼리가 내부 쿼리에 영향을 미치고 
+-- 내부 쿼리 결과가 다시 외부 쿼리에 영향을 미친다.
+
+
+
+-- 서브쿼리 연습
+-- 각 부서별로 최고 급여를 받는 사원의 목록? (조건절에서 서브쿼리 활용)
+-- 1. 각 부서별 최고 급여를 출력하는 쿼리
+SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id;
+
+-- 2. 1번 쿼리에서 나온 department_id 와 max(salary) 값을 이용해서 외부 쿼리 작성
+SELECT department_id, employee_id, first_name, salary
+FROM employees
+WHERE (department_id, salary) IN 
+        (SELECT department_id, MAX(salary) 
+        FROM employees 
+        GROUP BY department_id)
+ORDER BY department_id;
+
+-- 각 부서별로 최고 급여를 받는 사원 목록? (서브쿼리 이용, 임시 테이블 생성)-> 테이블 조인 결과 뽑기
+-- 1. 각 부서별 최고 급여를 출력하는 쿼리를 생성
+SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id;
+
+--2. 1번 쿼리에서 생성한 임시 테이블과 외부 쿼리를 조인하는 쿼리
+SELECT emp.department_id, emp.employee_id, emp.first_name, emp.salary
+FROM employees emp, (SELECT department_id, Max(salary) salary 
+                    FROM employees
+                    GROUP BY department_id) sal
+WHERE emp .department_id = sal.department_id    --JOIN조건
+    AND emp.salary = sal.salary 
+ORDER BY emp.department_id;
+
+
+-- TOP-K Query : Oracle에서만 사용가능 
+-- 질의의 결과로 부여된 가상 컬럼 rownum 값을 사용해서 쿼리순서 반환
+-- rownum 값을 활용해서 상위 k개의 값을 얻어오는 쿼리
+
+-- 2017년 입사자 중에서 연봉 순위 5위까지 출력
+-- 1. 2017년 입사자는 누구인가?
+SELECT * FROM employees 
+WHERE hire_date LIKE '17%'  -- 앞의 두개 데이터가 17
+ORDER BY salary DESC;
+
+--2. 1번 쿼리를 활용해서 rownum 값까지 확인, rownum <= 5 이하인 레코드 출력-> 상위5개 레코드
+SELECT rownum, first_name, salary
+FROM (SELECT * FROM employees 
+        WHERE hire_date LIKE '17%'
+        ORDER BY salary DESC)
+WHERE rownum <= 5;      -- 상위 5개
+
+
+-- 집합연산
+-- A UNION B = {a, b, c} 합집합
+-- A UNION ALL B = {a, b, b, c} 합집합(중복된 값 별개로 취급)
+-- A INTERSECT B = {b} 교집합
+-- A MINUS B = {a} 차집합
+
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01';   --15/01/01 이전 입사자 (24)
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;   -- 12000 초과 급여 받는 직원 목록 (8)
+
+-- 합집합 (UNION / UNION ALL)
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'
+UNION       -- 중복 레코드는 한개로 취급
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       --26행
+
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'
+UNION ALL   -- 중복 레코드를 별개로 취급
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       -- 32행
+
+-- 교집합  (INTERSECT)
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'
+INTERSECT    -- 교집합 -> INNER JOIN과 비슷
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       -- 6행
+
+-- 차집합  (MINUS)
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'
+MINUS       -- 차집합 
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       -- 18행
+
+
+--RANK 관련 함수 (Oracle 특화 함수)
+SELECT salary, first_name, 
+    RANK() OVER (ORDER BY salary DESC) as rank,  -- 일반적인 순위
+    DENSE_RANK() OVER (ORDER BY salary DESC) as dense_link,     
+    ROW_NUMBER() OVER (ORDER BY salary DESC) as row_number,     -- 정렬했을때의 실제 행번호
+    rownum                                          -- 쿼리 결과의 행번호(가상 컬럼)      
+FROM employees;
+
+
+-- Hierarchical Query (Oracle 특화)
+-- tree형태 구조 표현 (조직도같은 트리형태)
+-- level 가상 컬럼 활용 쿼리
+SELECT level,employee_id, first_name, manager_id
+FROM employees
+START WITH manager_id IS NULL                 -- tree 형태의 root가 되는 조건 명시 (시작조건)
+CONNECT BY PRIOR employee_id = manager_id   -- 상위 레벨과의 연결 조건 (가지치기 조건)
+ORDER BY level;                             -- tree의 깊이를 나타내는 Oracle의 가상컬럼
 
 
 

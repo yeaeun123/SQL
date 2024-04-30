@@ -398,6 +398,7 @@ SELECT first_name,
 FROM employees;
 
 -- CASE function
+-- SUBSTR (문자열, 시작위치, 길이)
 -- 보너스를 지급하기로 했다.
 -- AD관련 직원에게는 20%, SA관련 직원에게는 10%, IT관련 직원들에게는 8%, 나머지에게는 5%
 SELECT first_name, job_id, salary,
@@ -410,6 +411,7 @@ SELECT first_name, job_id, salary,
 FROM employees;
 
 -- DECODE function
+-- DECODE(대상값, 비교값1, 결과1, 비교값2, 결과2, ..., 기본결과)
 SELECT first_name, job_id, salary,
     SUBSTR(job_id, 1,2),
     DECODE(SUBSTR(job_id, 1, 2),     --비교할 값
