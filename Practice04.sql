@@ -74,7 +74,7 @@ ORDER BY salary DESC;
 연봉 총합이 가장 높은 업무부터 업무명(job_title)과 연봉 총합을 조회하시오
 (19건)*/
 --6-1 INNER JOIN
-SELECT j.job_title 업무, SUM(emp.salary*12) 연봉총합 
+SELECT j.job_title 업무, SUM(emp.salary)*12 연봉총합 
 FROM jobs j
 INNER JOIN employees emp ON j.job_id = emp.job_id
 GROUP BY j.job_title
@@ -102,14 +102,12 @@ ORDER BY salary;
 하세요*/
 
 
-SELECT *
+SELECT *    --아래 from절에서 불러온 모든 데이터 표기 
 FROM (SELECT row_number() OVER (ORDER BY hire_date) rnum,
         employee_id 사번, first_name 이름, salary 급여, hire_date 입사일
         FROM employees)
 WHERE rnum BETWEEN 11 AND 15;
         
-
-
 
 
 
