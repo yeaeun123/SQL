@@ -101,10 +101,6 @@ ORDER BY salary;
 직원 입사일이 11번째에서 15번째의 직원의 사번, 이름, 급여, 입사일을 입사일 순서로 출력
 하세요*/
 
-SELECT rownum, employee_id, first_name, salary, hire_date
-FROM (SELECT employee_id, first_name, salary, hire_date, rownum rnum FROM employees)
-WHERE rnum > 10 AND rnum < 16
-ORDER BY hire_date;
 
 SELECT *
 FROM (SELECT row_number() OVER (ORDER BY hire_date) rnum,
