@@ -15,7 +15,7 @@ WHERE salary < (SELECT AVG(salary) FROM employees);
 (51건)*/
 
 SELECT employee_id 직원번호, first_name 이름,
-    salary 급여, AVG(salary) OVER() 평균급여,
+    salary 급여, (SELECT(ROUND(AVG(salary),2)) FROM employees) 평균급여,
     MAX(salary) OVER() 최대급여
 FROM employees 
 WHERE salary >= (SELECT AVG(salary) FROM employees) AND
@@ -106,7 +106,12 @@ FROM (SELECT employee_id, first_name, salary, hire_date, rownum rnum FROM employ
 WHERE rnum > 10 AND rnum < 16
 ORDER BY hire_date;
 
-
+SELECT *
+FROM (SELECT row_number() OVER (ORDER BY hire_date) rnum,
+        employee_id, first_name, salary, hire_date
+        FROM employees)
+WHERE rnum BETWEEN 11 AND 15;
+        
 
 
 
