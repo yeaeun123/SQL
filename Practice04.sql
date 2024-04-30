@@ -74,25 +74,25 @@ ORDER BY salary DESC;
 연봉 총합이 가장 높은 업무부터 업무명(job_title)과 연봉 총합을 조회하시오
 (19건)*/
 --6-1 INNER JOIN
-SELECT j.job_title, SUM(emp.salary)
+SELECT j.job_title 업무, SUM(emp.salary*12) 연봉총합 
 FROM jobs j
 INNER JOIN employees emp ON j.job_id = emp.job_id
 GROUP BY j.job_title
 ORDER BY SUM(emp.salary) DESC;
 
 --6-2 서브쿼리
-SELECT job_title, (SELECT SUM(salary)   
+SELECT job_title 업무, (SELECT SUM(salary*12)   
                     FROM employees
-                    WHERE employees.job_id = jobs.job_id) salary
+                    WHERE employees.job_id = jobs.job_id) 연봉총합
 FROM jobs
-ORDER BY salary DESC;
+ORDER BY 연봉총합 DESC;
 
 /*문제7.
 자신의 부서 평균 급여보다 연봉(salary)이 많은 직원의 직원번호(employee_id), 이름
 (first_name)과 급여(salary)을 조회하세요
 (38건)*/
 
-SELECT employee_id, first_name, salary
+SELECT employee_id 직원번호, first_name 이름, salary 급여
 FROM employees outer
 WHERE salary > (SELECT AVG(salary) FROM employees WHERE department_id = outer.department_id)
 ORDER BY salary;
@@ -104,7 +104,7 @@ ORDER BY salary;
 
 SELECT *
 FROM (SELECT row_number() OVER (ORDER BY hire_date) rnum,
-        employee_id, first_name, salary, hire_date
+        employee_id 사번, first_name 이름, salary 급여, hire_date 입사일
         FROM employees)
 WHERE rnum BETWEEN 11 AND 15;
         
