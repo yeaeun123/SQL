@@ -80,10 +80,12 @@ ORDER BY AVG(salary)-MIN(salary) DESC;
 /*문제8.
 업무(JOBS)별로 최고임금과 최저임금의 차이를 출력해보세요.
 차이를 확인할 수 있도록 내림차순으로 정렬하세요?*/
+--8-1 .jobs테이블로 풀이
 SELECT job_title 업무,  max_salary - min_salary "최고임금-최저임금"
 FROM jobs
 ORDER BY max_salary-min_salary DESC;
-
+----------------------------------------
+-- 8-2. employees테이블 풀이(집계관련 풀이)
 SELECT 
     job_id, 
     MAX(salary) - MIN(salary) diff

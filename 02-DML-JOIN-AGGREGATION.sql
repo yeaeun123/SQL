@@ -507,7 +507,7 @@ WHERE rownum <= 5;      -- 상위 5개
 
 
 -- 집합연산
--- A UNION B = {a, b, c} 합집합
+-- A UNION B = {a, b, c} 합집합 (중복제거)
 -- A UNION ALL B = {a, b, b, c} 합집합(중복된 값 별개로 취급)
 -- A INTERSECT B = {b} 교집합
 -- A MINUS B = {a} 차집합
