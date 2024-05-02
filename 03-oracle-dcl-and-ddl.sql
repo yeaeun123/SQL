@@ -141,8 +141,77 @@ DESC emp_it;
 
 -- 테이블 삭제 : DROP TABLE 삭제할테이블
 DROP TABLE emp_it;
+
 SELECT * FROM tabs; --테이블 목록 정보확인
 DESC book;
+
+
+-- author 테이블 생성
+-- PK->NOT NULL + UNIQUE
+CREATE TABLE author (author_id NUMBER(10),
+                    author_name VARCHAR2(100) NOT NULL,
+                    author_desc VARCHAR2(500),
+                    PRIMARY KEY (author_id)
+                    );
+DESC author;
+
+--book 테이블의 author 컬럼 삭제
+-- 나중에 author_id 컬럼 추가 -> author.author_id와 참조 연결할 예정
+ALTER TABLE book DROP COLUMN author;
+DESC book;
+
+-- book 테이블에 author_id컬럼 추가
+-- author.author_id를 참조하는 컬럼  author.author_id와 같은 형태여야함
+ALTER TABLE book ADD (author_id NUMBER(10));
+DESC book;
+DESC author;
+
+-- book 테이블에 book_id도 author 테이블의 PK와 같은 데이터타입(NUMBER(10))으로 변경
+ALTER TABLE book MODIFY (book_id NUMBER(10));
+DESC book;
+
+-- book 테이블의 book_id 컬럼에 PRIMARY KEY 제약조건을 부여
+ALTER TABLE book 
+ADD CONSTRAINT pk_book_id PRIMARY KEY (book_id);
+DESC book;
+
+-- book 테이블의 author_id 컬럼과 author 테이블의 author_id를 FK로 연결
+
+ALTER TABLE book
+ADD CONSTRAINT fk_author_id
+    FOREIGN KEY (author_id)
+    REFERENCES author(author_id);
+
+--Data Dictionary
+--VIEW의 Prefix (USER:로그인한 사용자레벨, ALL:모든 사용자정보,DBA:관리자)
+-- USER_ : 현재 로그인된 사용자에게 허용된 뷰
+-- ALL_ : 모든 사용자 뷰
+-- DBA_ : DBA에게 허용된 뷰
+-- DICTIONARY의 테이블이나 컬럼 이름은 모두 대문자 사용! 
+
+--모든 딕셔너리 확인
+SELECT * FROM DICTIONARY; --1098
+
+-- 사용자 스키마 객체 : USER_OBJECTS
+SELECT * FROM USER_OBJECTS; 
+-- 사용자 스키마의 이름과 타입 정보 출력
+SELECT OBJECT_NAME, OBJECT_TYPE FROM USER_OBJECTS;
+
+-- 제약조건 확인
+SELECT * FROM USER_CONSTRAINTS;
+
+SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE, 
+        SEARCH_CONDITION, TABLE_NAME
+FROM USER_CONSTRAINTS;
+
+-- book 테이블에 적용된 제약조건의 확인
+SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE,
+        SEARCH_CONDITION
+FROM USER_CONSTRAINTS
+WHERE TABLE_NAME = 'BOOK';
+
+
+
 
 
 
