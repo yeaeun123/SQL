@@ -91,6 +91,17 @@ GRANT select ON employees TO himedia;
 SELECT * FROM hr.employees; --hr.employees에 select 할 수 있는 권한만 부여
 SELECT * FROM hr.departments; -- hr.departments 권한부여 받지 않아서 찾을 수 없음
 
+--현재 사용자에게 부여된 Role을 조회
+SELECT * FROM USER_ROLE_PRIVS;
+-- CONNECT 와 RESOURCE 역할은 어떤 권한으로 구성되어 있는가?
+--  sysdba로 진행
+--cmd에서 sqlplus sys/oracle as sysdba
+--cmd에서 DESC role_sys_privs;
+--CONNECT ROLE에는 어떤 권한이 포함되어 있는가?
+--cmd에서 SELECT privilege FROM role_sys_privs WHERE role='CONNECT';
+-- RESOURCE ROLE에는 어떤 권한이 포함되어 있는가?
+--cmd에서 SELECT privilege FROM role_sys_privs WHERE role='RESOURCE';
+
 -------------------------
 --DDL – Data Definition Language 
 --데이터 정의 언어 CREATE(생성), ALTER(변경), DROP(삭제), TRUNCATE(초기화) 
