@@ -73,7 +73,102 @@ SELECT * FROM USER_VIEWS;
 
 -------------------------
 --INDEX
+-------------------------
 -- 데이터에 대한 조회 속도를 높이기 위해 만든다.
+-- CREATE INDEX, DROP INDEX
+
+-- hr.employees 테이블 복사 s_emp 테이블 생성
+CREATE TABLE s_emp 
+    AS SELECT * FROM HR.employees;
+    
+DESC s_emp;
+SELECT * FROM s_emp;
+
+
+-- s_emp테이블의 employee_id에 UNIQUE INDEX를 걸어봄
+CREATE UNIQUE INDEX s_emp_id_pk
+ON s_emp (employee_id);
+
+-- 사용자가 가지고 있는 INDEX 확인
+SELECT * FROM USER_INDEXES;
+-- 어느 인덱스가 어느 컬럼에 걸려있는지 확인
+SELECT * FROM USER_IND_COLUMNS;
+
+-- 어느 인덱스가 어느 컬럼에 걸려있는지 JOIN해서 알아보기
+SELECT 
+    t.INDEX_NAME, c.COLUMN_NAME, c.COLUMN_POSITION 
+FROM USER_INDEXES t 
+    JOIN USER_IND_COLUMNS c
+    ON t.INDEX_NAME = c.INDEX_NAME
+WHERE t.TABLE_NAME = 'S_EMP';
+
+
+-------------------------
+-- SEQUENCE
+-------------------------
+SELECT * FROM author;
+
+-- 새로운 레코드 추가 / 겹치지 않는 유일한 PK가 필요
+INSERT INTO author (author_id, author_name)
+VALUES (
+    (SELECT MAX(author_id)+1 FROM author),
+    '이문열');
+    --> 개발,테스트 당시는 문제없으나 insert가 겹쳐버려서 사용중 문제 생길 수 있다!
+    --> 그래서 SEQUENCE 를 사용해야한다.
+SELECT * FROM author;
+ROLLBACK;
+
+-- 순차 객체 SEQUENCE 
+CREATE SEQUENCE seq_author_id 
+    START WITH 4
+    INCREMENT BY 1
+    MAXVALUE 1000000;
+    
+-- PK는 SEQUENCE 객체로부터 생성
+INSERT INTO author(author_id, author_name, author_desc)
+VALUES(seq_author_id.NEXTVAL, '스티븐 킹','쇼생크 탈출');
+
+SELECT * FROM author;
+
+SELECT seq_author_id.CURRVAL FROM dual;
+
+-- 새 시퀀스 생성 CREATE
+CREATE SEQUENCE my_seq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 10;
+
+SELECT my_seq.NEXTVAL FROM dual;    -- 다음 시퀀스 추출 가상 컬럼
+SELECT my_seq.CURRVAL FROM dual;    -- 현재 시퀀스 상태
+
+-- 시퀀스 수정 ALTER
+ALTER SEQUENCE my_seq
+    INCREMENT BY 2          --2씩 증가
+    MAXVALUE 1000000;
+    
+SELECT my_seq.CURRVAL FROM dual;
+SELECT my_seq.NEXTVAL FROM dual;
+
+-- 시퀀스를 위한 딕셔너리
+SELECT * FROM USER_SEQUENCES;
+
+SELECT * FROM USER_OBJECTS
+WHERE OBJECT_TYPE = 'SEQUENCE';
+
+-- 시퀀스 삭제 DROP
+DROP SEQUENCE my_seq;
+SELECT * FROM USER_SEQUENCES;
+
+-- book 테이블 pk의 현재 값 확인
+SELECT max(book_id) FROM book;
+
+CREATE SEQUENCE seq_book_id
+    START WITH 3
+    INCREMENT BY 1
+    MAXVALUE 1000000
+    NOCACHE;
+
+
 
 
 

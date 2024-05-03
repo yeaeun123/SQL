@@ -118,7 +118,7 @@ WHERE e.hire_date = (SELECT MAX(hire_date) FROM employees);
 /*문제7.
 평균급여(salary)이 가장 높은 부서 직원들의 직원번호(employee_id), 이름(firt_name), 성
 (last_name)과 업무(job_title), 급여(salary)을 조회하시오.*/
------모르겠음ㅜㅜ
+
 SELECT employee_id 직원번호, first_name 이름, last_name 성, job_title 업무,
         salary 급여, AVG(salary) OVER (ORDER BY department_id) 평균급여
 FROM employees JOIN jobs USING (job_id)
