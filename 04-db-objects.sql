@@ -170,5 +170,15 @@ CREATE SEQUENCE seq_book_id
 
 
 
+---------------------------------------
+SELECT * FROM user_objects WHERE OBJECT_TYPE ='SEQUENCE';
+DELETE FROM author;
+COMMIT;
+SELECT * FROM author;
+DESC author;
 
+-- LIST
+SELECT author_id, author_name, author_desc FROM author;
+
+DESC employees;
 

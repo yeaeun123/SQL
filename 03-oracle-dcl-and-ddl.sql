@@ -289,6 +289,8 @@ SELECT * FROM author;
 
 COMMIT;
 
+
+
 --연습
 -- hr.employees 테이블을 기반으로 department_id 10, 20, 30인 직원들만 새 테이블 emp123으로 생성
 DROP TABLE emp123;
