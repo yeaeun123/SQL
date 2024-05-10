@@ -1,0 +1,29 @@
+CREATE TABLE phonebook(
+        list_info NUMBER(10),
+        insert_name VARCHAR(100),
+        insert_phone VARCHAR(100),
+        insert_homenumber VARCHAR(100)
+        );
+DESC phonebook;
+
+INSERT INTO phonebook VALUES(1, '고길동','010-2222-3333', '02-555-1111');
+INSERT INTO phonebook VALUES(2, '도우너', '010-1111-4444', '02-777-5555');
+INSERT INTO phonebook VALUES(3, '마이클', '010-1234-5678', '02-9874-6541');
+INSERT INTO phonebook VALUES(4, '또치', '010-8888-9000', '02-4444-7777');
+
+SELECT * FROM phonebook;
+
+CREATE SEQUENCE seq_list_info
+    START WITH 5
+    INCREMENT BY 1
+    MAXVALUE 100;
+    
+select * from user_sequences;    
+
+ALTER TABLE phonebook 
+ADD CONSTRAINT pk_list_info PRIMARY KEY (list_info);
+
+DROP TABLE phonebook;
+DROP SEQUENCE seq_list_info;
+        
+        
