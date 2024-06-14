@@ -9,3 +9,5 @@ CREATE TABLE users (
 DESCRIBE users;
 
 CREATE SEQUENCE seq_users_pk;
+
+SELECT * FROM users;
